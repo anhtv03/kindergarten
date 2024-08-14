@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  server:
+    image: kindergarten_server_image 
+    ports:
+      - "8080:8080"
+    volumes:
+      - F:\kindergarten\KingerGarten_Project\back-end\koffee-keys.json:/app/key.json
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/key.json
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/kindergarten?timezone=Asia/Ho_Chi_Minh
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=12345678
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: mysql:latest
+    environment:
+        MYSQL_ROOT_PASSWORD: 12345678
+        MYSQL_DATABASE: kindergarten
+        TZ: Asia/Ho_Chi_Minh
+    ports:
+      - "3307:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
+      - /usr/share/zoneinfo:/usr/share/zoneinfo:ro
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6378:6379"
+    volumes:
+      - redis-data:/data
+
+  client:
+    image: kindergarten_client_image
+    ports:
+      - "3000:3000"
+
+
+volumes:
+    db-data:
+    redis-data:
